@@ -1,15 +1,56 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App';
+export default {
+  fetch: async (request: Request): Promise<Response> => {
+    const url = new URL(request.url);
+    const path = url.pathname;
 
-const rootElement = document.getElementById('root');
-if (!rootElement) {
-  throw new Error("Could not find root element to mount to");
-}
+    // Simple routing for your API
+    if (path === '/' || path === '') {
+      return new Response(
+        JSON.stringify({
+          message: 'Welcome to Tianji Worker',
+          status: 'running',
+          timestamp: new Date().toISOString(),
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+    }
 
-const root = ReactDOM.createRoot(rootElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+    if (path === '/api/status') {
+      return new Response(
+        JSON.stringify({
+          service: 'tianji',
+          status: 'active',
+          uptime: 'ok',
+        }),
+        {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+          },
+        }
+      );
+    }
+
+    // Default 404 response
+    return new Response(
+      JSON.stringify({
+        error: 'Not Found',
+        path: path,
+      }),
+      {
+        status: 404,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+      }
+    );
+  },
+} as ExportedHandler;
